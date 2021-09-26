@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+    {%block content%}
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <h1 >The predicted KNN result is : <span class="text-muted mr-2 article-title">{{prediction}}00 %</span></h1>
+                </div>
+                
+                    {% if prediction ==1 %}
+                    <h5 class="text-muted mr-2 article-title">Highly recommanded to collect the waste</h5>
+                    {% elif prediction==0 %}
+                    <h5 class="text-muted mr-2 article-title"> Not recommanded to collect the waste</h5>
+                    {% endif %}
+               
+                    
+            </div>
+            
+              <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
+              <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
+              <script type="text/javascript">
+                FusionCharts.ready(function(){
+                  var chartObj = new FusionCharts({
+                type: 'cylinder',
+                dataFormat: 'json',
+                renderAt: 'chart-container',
+                width: '200',
+                height: '350',
+                dataSource: {
+                    "chart": {
+                        "theme": "fusion",
+                        "caption": "Dustbin Status",
+                        "subcaption": "in real-time",
+                        "lowerLimit": "0",
+                        "upperLimit": "100",
+                        "lowerLimitDisplay": "Empty",
+                        "upperLimitDisplay": "Full",
+                        "numberSuffix": " %",
+                        "showValue": "1",
+                        "chartBottomMargin": "45",
+                        "showValue": "0",
+                  "cylFillColor": "#eeee"
+                    },
+                    "value": "100",
+                    "annotations": {
+                        "origw": "400",
+                        "origh": "190",
+                        "autoscale": "1",
+                        "groups": [{
+                            "id": "range",
+                            "items": [{
+                                "id": "rangeBg",
+                                "type": "rectangle",
+                                "x": "$canvasCenterX-45",
+                                "y": "$chartEndY-30",
+                                "tox": "$canvasCenterX +45",
+                                "toy": "$chartEndY-75",
+                                "fillcolor": "#5f788a"
+                            }, {
+                                "id": "rangeText",
+                                "type": "Text",
+                                "fontSize": "11",
+                                "fillcolor": "#333333",
+                                "text": "80 %",
+                                "x": "$chartCenterX-45",
+                                "y": "$chartEndY-50"
+                            }]
+                        }]
+                    }
+            
+                },
+                "events": {
+                    "rendered": function(evtObj, argObj) {
+                        var fuelVolume = 100;
+                        evtObj.sender.chartInterval = setInterval(function() {
+                            (fuelVolume < 10) ? (fuelVolume = 80) : "";
+                            var consVolume = '{{prediction}}'+'00';
+                            evtObj.sender.feedData && evtObj.sender.feedData("&value=" + consVolume);
+                            fuelVolume = consVolume;
+                        }, 1000);
+                    },
+                    //Using real time update event to update the annotation
+                    //showing available volume of Diesel
+                    "realTimeUpdateComplete": function(evt, arg) {
+                        var annotations = evt.sender.annotations,
+                            dataVal = evt.sender.getData(),
+                            colorVal = (dataVal >= 75) ? "#008b2f" : ((dataVal >= 50) ? "#1dda0c" : ((dataVal <= 25)? "#ff9102" : "#f8bd1b"));
+                        //Updating value
+                        annotations && annotations.update('rangeText', {
+                            "text": dataVal + " %"
+                        });
+                        //Changing background color as per value
+                        annotations && annotations.update('rangeBg', {
+                            "fillcolor": colorVal
+                        });
+            
+                    },
+                    "disposed": function(evt, arg) {
+                        clearInterval(evt.sender.chartInterval);
+                    }
+                }
+            }
+            );
+                  chartObj.render();
+                });
+              </script>
+        </article>
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <h2 >The predicted Random Forest result is: <span class="text-muted mr-2 article-title">{{rf}} %</span> </h1>
+                </div>
+                {% if rf ==100 %}
+                    <h5 class="text-muted mr-2 article-title">Highly recommanded to collect the waste</h5>
+                    {% elif rf==75 %}
+                    <h5 class="text-muted mr-2 article-title">Recommanded to collect the waste</h5>
+                    {% elif rf==50 %}
+                    <h5 class="text-muted mr-2 article-title">Slightly to collect the waste</h5>
+                    {% elif rf==25 %}
+                    <h5 class="text-muted mr-2 article-title">Not recommanded to collect the waste</h5>
+                    {% endif %}
+                    <div id="chart-container" style="position: relative; left: 500px;"></div>
+                    
+            </div>
+            
+              <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
+              <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
+              <script type="text/javascript">
+                FusionCharts.ready(function(){
+                  var chartObj = new FusionCharts({
+                type: 'cylinder',
+                dataFormat: 'json',
+                renderAt: 'chart-container',
+                width: '200',
+                height: '350',
+                dataSource: {
+                    "chart": {
+                        "theme": "fusion",
+                        "caption": "Dustbin Status",
+                        "subcaption": "in real-time",
+                        "lowerLimit": "0",
+                        "upperLimit": "100",
+                        "lowerLimitDisplay": "Empty",
+                        "upperLimitDisplay": "Full",
+                        "numberSuffix": " %",
+                        "showValue": "1",
+                        "chartBottomMargin": "45",
+                        "showValue": "0",
+                  "cylFillColor": "#eeee"
+                    },
+                    "value": "100",
+                    "annotations": {
+                        "origw": "400",
+                        "origh": "190",
+                        "autoscale": "1",
+                        "groups": [{
+                            "id": "range",
+                            "items": [{
+                                "id": "rangeBg",
+                                "type": "rectangle",
+                                "x": "$canvasCenterX-45",
+                                "y": "$chartEndY-30",
+                                "tox": "$canvasCenterX +45",
+                                "toy": "$chartEndY-75",
+                                "fillcolor": "#5f788a"
+                            }, {
+                                "id": "rangeText",
+                                "type": "Text",
+                                "fontSize": "11",
+                                "fillcolor": "#333333",
+                                "text": "80 %",
+                                "x": "$chartCenterX-45",
+                                "y": "$chartEndY-50"
+                            }]
+                        }]
+                    }
+            
+                },
+                "events": {
+                    "rendered": function(evtObj, argObj) {
+                        var fuelVolume = 100;
+                        evtObj.sender.chartInterval = setInterval(function() {
+                            (fuelVolume < 10) ? (fuelVolume = 80) : "";
+                            var consVolume = '{{rf}}';
+                            evtObj.sender.feedData && evtObj.sender.feedData("&value=" + consVolume);
+                            fuelVolume = consVolume;
+                        }, 1000);
+                    },
+                    //Using real time update event to update the annotation
+                    //showing available volume of Diesel
+                    "realTimeUpdateComplete": function(evt, arg) {
+                        var annotations = evt.sender.annotations,
+                            dataVal = evt.sender.getData(),
+                            colorVal = (dataVal >= 75) ? "#008b2f" : ((dataVal >= 50) ? "#1dda0c" : ((dataVal <= 25)? "#ff9102" : "#f8bd1b"));
+                        //Updating value
+                        annotations && annotations.update('rangeText', {
+                            "text": dataVal + " %"
+                        });
+                        //Changing background color as per value
+                        annotations && annotations.update('rangeBg', {
+                            "fillcolor": colorVal
+                        });
+            
+                    },
+                    "disposed": function(evt, arg) {
+                        clearInterval(evt.sender.chartInterval);
+                    }
+                }
+            }
+            );
+                  chartObj.render();
+                });
+              </script>
+                                  <div id="chart-container" style="position: relative; left: 500px;"></div>
+
+        </article>
+    {% endblock content %}
+    
+   
